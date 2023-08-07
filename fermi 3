@@ -1,0 +1,52 @@
+function fermiGUI
+    % GUI 객체 생성 및 초기화
+    fig = uifigure('Name', '페르미 함수 GUI', 'Position', [100 100 800 600]);
+    electronAx = uiaxes(fig, 'Position', [50 350 700 200]);
+    holeAx = uiaxes(fig, 'Position', [50 100 700 200]);
+    temperatureSlider = uislider(fig, 'Position', [100 50 600 3], 'Limits', [0 500], 'ValueChangingFcn', @(slider,event)sliderValueChanged());
+
+    % 온도 조절바 값 변경 콜백 함수
+    function sliderValueChanged(~, ~)
+        % 현재 온도 값 가져오기
+        T = temperatureSlider.Value;
+
+        % 에너지 범위와 페르미 에너지 설정
+        E = 0.95:0.005:1.25;
+        E_f = 1.1;
+        K = 8.617343e-5;
+
+        % 전자와 정공에 대한 페르미 함수 계산
+        f_electron = zeros(length(T), length(E));
+        f_hole = zeros(length(T), length(E));
+        for i = 1:length(T)
+            f_electron(i, :) = 1./(1 + exp((E - E_f)./(K * T(i))));
+            f_hole(i, :) = 1 - f_electron(i, :);
+        end
+
+        % 전자에 대한 페르미 함수 3D 그래프 그리기
+        cla(electronAx);
+        [E_mesh, T_mesh] = meshgrid(E, T);
+        surf(electronAx, E_mesh, T_mesh, f_electron');
+        colormap(electronAx, 'jet');
+        shading(electronAx, 'interp');
+
+        % 축 레이블 설정
+        xlabel(electronAx, '에너지 E [eV]');
+        ylabel(electronAx, '온도 T [K]');
+        zlabel(electronAx, '전자에 대한 페르미 함수 f_e');
+
+        % 정공에 대한 페르미 함수 3D 그래프 그리기
+        cla(holeAx);
+        surf(holeAx, E_mesh, T_mesh, f_hole');
+        colormap(holeAx, 'jet');
+        shading(holeAx, 'interp');
+
+        % 축 레이블 설정
+        xlabel(holeAx, '에너지 E [eV]');
+        ylabel(holeAx, '온도 T [K]');
+        zlabel(holeAx, '정공에 대한 페르미 함수 f_hole');
+
+        % 그래프 창 크기 조정
+        set(gcf, 'Position', [100 100 800 600]);
+    end
+end
