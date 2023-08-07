@@ -1,0 +1,67 @@
+function fermiGUI
+    % GUI 객체 생성 및 초기화
+    fig = uifigure('Name', '페르미 함수 GUI', 'Position', [100 100 800 600]);
+    electronAxes = uiaxes(fig, 'Position', [50 350 700 200]);
+    holeAxes = uiaxes(fig, 'Position', [50 100 700 200]);
+    plotButton = uibutton(fig, 'Text', '그래프 그리기', 'Position', [350 50 100 25], 'ButtonPushedFcn', @(btn,event)plotButtonPushed());
+    
+    % plotButton 콜백 함수
+    function plotButtonPushed()
+        cla(electronAxes);
+        cla(holeAxes);
+        
+        % 에너지 범위와 페르미 에너지, 온도 설정
+        E = 0.95:0.005:1.25;
+        E_f = 1.1;
+        K = 8.617343e-5;
+        T1 = 30;
+        T2 = 130;
+        T3 = 230;
+        T4 = 330;
+        
+        % 전자에 대한 페르미 함수 계산
+        f1_e = 1./(1+exp((E-E_f)./(K*T1)));
+        f2_e = 1./(1+exp((E-E_f)./(K*T2)));
+        f3_e = 1./(1+exp((E-E_f)./(K*T3)));
+        f4_e = 1./(1+exp((E-E_f)./(K*T4)));
+        
+        % 정공에 대한 페르미 함수 계산
+        f1_hole = 1-f1_e;
+        f2_hole = 1-f2_e;
+        f3_hole = 1-f3_e;
+        f4_hole = 1-f4_e;
+        
+        % 전자에 대한 페르미 함수 그래프 그리기
+        hold(electronAxes, 'on');
+        plot(electronAxes, E, f1_e, '*-r');
+        plot(electronAxes, E, f2_e, '*-b');
+        plot(electronAxes, E, f3_e, '*-g');
+        plot(electronAxes, E, f4_e, '*-y');
+        
+        set(electronAxes, 'XColor', 'k', 'YColor', 'k');
+        xlabel(electronAxes, '에너지 E [eV]');
+        ylabel(electronAxes, '전자에 대한 페르미함수 f_{e}');
+        title(electronAxes, '전자에 대한 페르미 함수 f_{e} vs 캐리어 에너지 E');
+        legend(electronAxes, ['T=', num2str(T1), '[^{o}K]'], ['T=', num2str(T2), '[^{o}K]'], ['T=', num2str(T3), '[^{o}K]'], ['T=', num2str(T4), '[^{o}K]']);
+        grid(electronAxes, 'on');
+        grid(electronAxes, 'minor');
+        
+        % 정공에 대한 페르미 함수 그래프 그리기
+        hold(holeAxes, 'on');
+        plot(holeAxes, E, f1_hole, '*-r');
+        plot(holeAxes, E, f2_hole, '*-b');
+        plot(holeAxes, E, f3_hole, '*-g');
+        plot(holeAxes, E, f4_hole, '*-y');
+        
+        set(holeAxes, 'XColor', 'k', 'YColor', 'k');
+        xlabel(holeAxes, '에너지 E [eV]');
+        ylabel(holeAxes, '정공에 대한 페르미함수 f_{e}');
+        title(holeAxes, '정공에 대한 페르미 함수 f_{e} vs 캐리어 에너지 E');
+        legend(holeAxes, ['T=', num2str(T1), '[^{o}K]'], ['T=', num2str(T2), '[^{o}K]'], ['T=', num2str(T3), '[^{o}K]'], ['T=', num2str(T4), '[^{o}K]']);
+        grid(holeAxes, 'on');
+        grid(holeAxes, 'minor');
+        
+        % 그래프 창 크기 조정
+        set(gcf, 'Position', [100 100 800 600]);
+    end
+end
